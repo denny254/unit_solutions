@@ -28,6 +28,22 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):  # type: ignore
         return token
 
 
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class NewPasswordSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        if data["new_password"] != data["confirm_password"]:
+            raise serializers.ValidationError("Passwords must match.")
+        return data
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

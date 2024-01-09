@@ -1,29 +1,17 @@
 from django.urls import path
-from .import views
-
-from solutions.views import (
+from . import views
+from .views import (
     CustomUserCreateView,
     CustomUserListView,
     CustomUserRetrieveUpdateDestroyView,
     FindUserView,
     user_details,
-)
-
-from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
-
-from solutions.views import (
-    EmailActivationManager,
     MyTokenObtainPairView,
     PasswordChangeManager,
-    PasswordResetRequestManager,
-    confirm_email_address_set_password,
-    resend_confirmation_email,
 )
-from django.contrib.auth.views import (
-    PasswordResetCompleteView,
-    PasswordResetConfirmView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView
+from django.contrib.auth import views as auth_views
+from .views import PasswordResetRequestView, PasswordResetValidationView
 
 
 urlpatterns = [
@@ -57,11 +45,7 @@ urlpatterns = [
     # projects
     path("projects/", views.project_list, name="project-list"),
     path("projects/<int:pk>/", views.project_detail, name="project-detail"),
-
-
-    # Signin up the user 
-
-
+    # Signin up the user
     path("user/sign-in/", MyTokenObtainPairView.as_view(), name="sign-in"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path(
@@ -69,42 +53,10 @@ urlpatterns = [
         PasswordChangeManager.as_view(),
         name="password_change",
     ),
+    path("password-reset/", PasswordResetRequestView.as_view(), name="password-reset"),
     path(
-        "confirm-email/",
-        EmailActivationManager.as_view(),
-        name="email_confirmation",
-    ),
-    path(
-        "resend-confirmation-email/<uidb64>/",
-        resend_confirmation_email,
-        name="resend_confirmation_email",
-    ),
-    path(
-        "confirm-email-set-password/<uidb64>/<token>/",
-        confirm_email_address_set_password,
-        name="confirm_email_address_set_password",
-    ),
-    path(
-        "reset-password/",
-        PasswordResetRequestManager.as_view(),
-        name="password_reset_request",
-    ),
-    path(
-        "reset-password/<uidb64>/<token>/",
-        PasswordResetConfirmView.as_view(template_name="reset-password.html"),
-        name="password_reset_confirm",
-    ),
-    # path(
-    #     "reset-password/<uidb64>/<token>/",
-    #     PasswordResetConfirmView.as_view(),
-    #     name="password_reset_confirm",
-    # ),
-    path(
-        "reset-password/done/",
-        PasswordResetCompleteView.as_view(template_name="password-reset-done.html"),
-        name="password_reset_complete",
+        "password-reset-confirm",
+        PasswordResetValidationView.as_view(),
+        name="password-reset-confirm",
     ),
 ]
-
-
-

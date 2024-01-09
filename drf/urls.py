@@ -5,11 +5,10 @@ from django.conf.urls.static import static
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.contrib.auth import views as auth_views
+from rest_framework.routers import DefaultRouter
 
-# Site header, site title, index title to the admin side.
-# admin.site.site_header = "Unity-Solutions Admin Site"
-# admin.site.site_title = "Unity-Solutions Admin Site"
-# admin.site.index_title = "Welcome To Unity-Solutions Site"
+
 
 
 schema_view = get_schema_view(
@@ -32,6 +31,7 @@ urlpatterns = [
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("api/", include("solutions.urls")),
     path("admin/", admin.site.urls),
+ 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

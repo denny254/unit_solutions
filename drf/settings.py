@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from typing import List
-from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,12 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-
     # LOCAL_APPS
     "solutions",
-
-
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
     "rest_framework_swagger",
@@ -78,7 +73,7 @@ ROOT_URLCONF = "drf.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -196,64 +191,9 @@ SWAGGER_SETTINGS = {
     }
 }
 
-# # Mail server
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = (
-#     os.environ["EMAIL_HOST"] if "EMAIL_HOST" in os.environ else config("EMAIL_HOST")
-# )
-# EMAIL_PORT = (
-#     os.environ["EMAIL_PORT"] if "EMAIL_PORT" in os.environ else config("EMAIL_PORT")
-# )
-# EMAIL_HOST_USER = (
-#     os.environ["EMAIL_HOST_USER"]
-#     if "EMAIL_HOST_USER" in os.environ
-#     else config("EMAIL_HOST_USER")
-# )
-# EMAIL_HOST_PASSWORD = (
-#     os.environ["EMAIL_HOST_PASSWOR    D"]
-#     if "EMAIL_HOST_PASSWORD" in os.environ
-#     else config("EMAIL_HOST_PASSWORD")
-# )
-# EMAIL_USE_TLS = (
-#     os.environ["EMAIL_USE_TLS"]
-#     if "EMAIL_USE_TLS" in os.environ
-#     else config("EMAIL_USE_TLS")
-# )
-# EMAIL_USE_SSL = (
-#     os.environ["EMAIL_USE_SSL"]
-#     if "EMAIL_USE_SSL" in os.environ
-#     else config("EMAIL_USE_SSL")
-# )
-# DEFAULT_FROM_EMAIL = (
-#     os.environ["DEFAULT_FROM_EMAIL"]
-#     if "DEFAULT_FROM_EMAIL" in os.environ
-#     else config("DEFAULT_FROM_EMAIL")
-# )
-
-# # IMAP settings
-# IMAP_HOST = config("SMTP_HOST")
-# IMAP_USER = config("SMTP_USER")
-# # IMAP_USER = "sopacrmtest@gmail.com"
-# print(IMAP_USER)
-# IMAP_PASSWORD = config("SMTP_PASSWORD")
-# # IMAP_PASSWORD = "pibqyafshnzeyxtx"
-# IMAP_PORT = config("SMTP_PORT")
-# IMAP_USE_TLS = config("SMTP_USE_TLS")
-# # pop mail settings
-# POP_HOST = config("POP_HOST")
-# POP_USER = config("POP_USER")
-# POP_PASSWORD = config("POP_PASSWORD")
-# POP_PORT = config("POP_PORT")
-# POP_USE_TLS = config("POP_USE_TLS")
-
-# # SMS Gateway
-# SMS_GATEWAY_API_KEY = (
-#     os.environ["SMS_GATEWAY_API_KEY"]
-#     if "SMS_GATEWAY_API_KEY" in os.environ
-#     else config("SMS_GATEWAY_API_KEY")
-# )
-# SMS_SENDER_ID = (
-#     os.environ["SMS_SENDER_ID"]
-#     if "SMS_SENDER_ID" in os.environ
-#     else config("SMS_SENDER_ID")
-# )
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "denniskinanga6@gmail.com"
+EMAIL_HOST_PASSWORD = "yush xnqz zmvp vnkg"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
