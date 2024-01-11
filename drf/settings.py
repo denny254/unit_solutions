@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-(ma!0=%dn(gqh@a0q*1x5-09sp&0e^+9pwidt%+0#7aat)jrjj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  
+DEBUG = False 
 
 ALLOWED_HOSTS = ["vercel.app", "*"]
 CORS_ALLOWED_ORIGINS: List[str] = []
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "corsheaders",
-    "django_rest_passwordreset",
+   
     # "rest_framework_simplejwt.token_blacklist",
 ]
 
