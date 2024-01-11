@@ -78,8 +78,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel)
         verbose_name=_("Last Name"), max_length=30, blank=False
     )
     email = models.EmailField(unique=True, verbose_name=_("Email Address"))
-    phone = models.CharField(max_length=12, blank=True)
-    alternate_phone = models.CharField(max_length=12, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    alternate_phone = models.CharField(max_length=15, blank=True)
     date_joined = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     is_active = models.BooleanField(

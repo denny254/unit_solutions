@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "corsheaders",
+    "django_rest_passwordreset",
     # "rest_framework_simplejwt.token_blacklist",
 ]
 
@@ -194,6 +195,6 @@ SWAGGER_SETTINGS = {
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST_USER = "denniskinanga6@gmail.com"
-EMAIL_HOST_PASSWORD = "yush xnqz zmvp vnkg"
+EMAIL_HOST_PASSWORD = "wdzb hyka tysc qndh"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

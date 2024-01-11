@@ -28,8 +28,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):  # type: ignore
         return token
 
 
-class PasswordResetSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+
 
 
 class NewPasswordSerializer(serializers.Serializer):

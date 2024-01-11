@@ -11,7 +11,6 @@ from .views import (
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import views as auth_views
-from .views import PasswordResetRequestView, PasswordResetValidationView
 
 
 urlpatterns = [
@@ -52,11 +51,5 @@ urlpatterns = [
         "change-password",
         PasswordChangeManager.as_view(),
         name="password_change",
-    ),
-    path("password-reset/", PasswordResetRequestView.as_view(), name="password-reset"),
-    path(
-        "password-reset-confirm",
-        PasswordResetValidationView.as_view(),
-        name="password-reset-confirm",
-    ),
+    )
 ]
