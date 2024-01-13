@@ -49,7 +49,6 @@ from .models import User
 from .serializers import NewPasswordSerializer
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from .emails_utilis import send_password_reset_email
 
 
 User = get_user_model()

@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-(ma!0=%dn(gqh@a0q*1x5-09sp&0e^+9pwidt%+0#7aat)jrjj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
+DEBUG = True
 
 ALLOWED_HOSTS = ["vercel.app", "*"]
 CORS_ALLOWED_ORIGINS: List[str] = []
@@ -32,11 +32,11 @@ INSTALLED_APPS = [
     "solutions",
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
+    "django_rest_passwordreset",
     "rest_framework_swagger",
     "rest_framework_simplejwt",
     "drf_yasg",
     "corsheaders",
-   
     # "rest_framework_simplejwt.token_blacklist",
 ]
 
@@ -194,7 +194,7 @@ SWAGGER_SETTINGS = {
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "denniskinanga6@gmail.com"
-EMAIL_HOST_PASSWORD = "wdzb hyka tysc qndh"
+EMAIL_HOST_USER = "unitysolutions507@gmail.com"
+EMAIL_HOST_PASSWORD = "ijdc qqvj cjqq qfkv"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
