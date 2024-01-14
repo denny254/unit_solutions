@@ -194,7 +194,7 @@ SWAGGER_SETTINGS = {
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "unitysolutions507@gmail.com"
-EMAIL_HOST_PASSWORD = "ijdc qqvj cjqq qfkv"
+EMAIL_HOST_USER = "unitysolutions8@gmail.com"
+EMAIL_HOST_PASSWORD = "ucdl aifj zkhj issz"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

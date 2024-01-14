@@ -124,9 +124,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel)
         ordering = ["-date_joined"]
 
 
-        
-
-#writers model for writers
+# writers model for writers
 class Writers(models.Model):
     name = models.CharField(max_length=255)
     specialization = models.CharField(max_length=255)
@@ -149,9 +147,10 @@ class Task(models.Model):
         ("Resubmission", "Resubmission"),
         ("Pending", "Pending"),
     )
+    title = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     writer = models.CharField(max_length=255)
-    client = models.CharField(max_length=255)
+    # client = models.CharField(max_length=255)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
 
@@ -171,7 +170,7 @@ class Project(models.Model):
     )
     title = models.CharField(max_length=255)
     deadline = models.DateField()
-    writer_assigned = models.CharField(max_length=255)
+    client = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
         blank=True, null=True, upload_to="images", default="avator.png"

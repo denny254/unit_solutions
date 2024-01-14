@@ -28,9 +28,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):  # type: ignore
         return token
 
 
-
-
-
 class NewPasswordSerializer(serializers.Serializer):
     uidb64 = serializers.CharField()
     token = serializers.CharField()
@@ -94,7 +91,8 @@ class WriterSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["id", "status", "writer", "client", "book_balance", "deadline"]
+        fields = ["id", "title", "status", "writer",
+                   "book_balance", "deadline"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
