@@ -2,8 +2,9 @@ from .serializers import (
     WriterSerializer,
     TaskSerializer,
     ProjectSerializer,
+    ClientSerializer,
 )
-from .models import Writers, Task, Project
+from .models import Writers, Task, Project, Clients
 from rest_framework.decorators import api_view
 
 from django.http import JsonResponse
@@ -20,36 +21,20 @@ from solutions.serializers import (
     UserSerializer,
 )
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import (
     get_object_or_404,
-    render,
 )
-from django.utils.http import urlsafe_base64_encode
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from solutions.serializers import MyTokenObtainPairSerializer
-from solutions.forms import (
-    CustomPasswordResetForm,
-    PasswordSetForm,
-)
 from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_str
-from django.contrib.auth.tokens import default_token_generator
 
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_bytes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User
-from .serializers import NewPasswordSerializer
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-
 
 User = get_user_model()
 
@@ -106,6 +91,100 @@ def delete_writer(request, writer_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     writer.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# CRUD for tasks
+@api_view(["GET", "POST"])
+def task_list(request):
+    if request.method == "GET":
+        tasks = Task.objects.all()
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def task_detail(request, pk):
+    try:
+        task = Task.objects.get(pk=pk)
+    except Task.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = TaskSerializer(task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# CRUD for writers
+@api_view(["POST"])
+def create_client(request):
+    serializer = ClientSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+def get_all_clients(request):
+    clients = Clients.objects.all()
+    serializer = ClientSerializer(clients, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def get_client(request, client_id):
+    try:
+        client = Clients.objects.get(pk=client_id)
+    except Clients.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ClientSerializer(client)
+    return Response(serializer.data)
+
+
+@api_view(["PUT", "PATCH"])
+def update_client(request, client_id):
+    try:
+        client = Clients.objects.get(pk=client_id)
+    except Clients.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = WriterSerializer(
+        client, data=request.data, partial=True if request.method == "PATCH" else False
+    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["DELETE"])
+def delete_client(request, client_id):
+    try:
+        client = Clients.objects.get(pk=client_id)
+    except Clients.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    client.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -287,9 +366,33 @@ class PasswordChangeManager(APIView):
         )
 
 
+class PasswordResetManager(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        new_password1 = request.data.get("new_password1", None)
+        new_password2 = request.data.get("new_password2", None)
+
+        if not (new_password1 and new_password2):
+            return Response({"error": "Both new password fields are required."}, status=400)
+
+        if new_password1 != new_password2:
+            return Response({"error": "Passwords do not match."}, status=400)
+
+        # Update the user's password
+        user.set_password(new_password1)
+        user.save()
+
+        return Response({"message": "Password reset successful."}, status=200)
+
+    def handle_error(self, error):
+        # Handle the error and return an error response
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"errors": {"detail": "Internal server error"}},
+        )
+
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
     serializer_class = MyTokenObtainPairSerializer
-
-
-
-

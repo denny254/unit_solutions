@@ -1,9 +1,5 @@
 from rest_framework import serializers
-from solutions.models import (
-    Writers,
-    Task,
-    Project,
-)
+from solutions.models import Writers, Task, Project, Clients
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
@@ -88,11 +84,24 @@ class WriterSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "specialization", "date", "email", "phone_number"]
 
 
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Clients
+        fields = [
+            "id",
+            "company_name",
+            "type_of_content",
+            "project_deadline",
+            "contact_email",
+            "contact_phone",
+            "project_description",
+        ]
+
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["id", "title", "status", "writer",
-                   "book_balance", "deadline"]
+        fields = ["id", "title", "status", "writer", "book_balance", "deadline"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):

@@ -28,8 +28,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+
     # LOCAL_APPS
     "solutions",
+
+
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
     "django_rest_passwordreset",
@@ -38,7 +42,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "corsheaders",
     # "rest_framework_simplejwt.token_blacklist",
-]
+ ]
 
 
 MIDDLEWARE = [

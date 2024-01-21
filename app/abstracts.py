@@ -4,7 +4,7 @@ from uuid import uuid4
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from app.utils import generate_number
+# from app.utils import generate_number
 
 
 class TimeStampedModel(models.Model):
@@ -18,9 +18,7 @@ class TimeStampedModel(models.Model):
         editable=False,
         null=True,
     )
-    updated_at = models.DateTimeField(
-        _("Updated at"), auto_now=True, null=True
-    )
+    updated_at = models.DateTimeField(_("Updated at"), auto_now=True, null=True)
 
     class Meta:
         """
@@ -35,43 +33,43 @@ class TimeStampedModel(models.Model):
         )
 
 
-class IDModel(models.Model):
-    """
-    An abstract base class that allows us to generate a unique id for each model.
-    """
+# class IDModel(models.Model):
+#     """
+#     An abstract base class that allows us to generate a unique id for each model.
+#     """
 
-    id = models.CharField(primary_key=True, max_length=255, editable=False)
+#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
-    class Meta:
-        abstract = True
+#     class Meta:
+#         abstract = True
 
-    def save(self, *args: Any, **kwargs: Any) -> Any:
-        if not self.id:
-            is_unique = False
-            while not is_unique:
-                id = uuid4().hex
-                is_unique = not self.__class__.objects.filter(id=id).exists()
+#     def save(self, *args: Any, **kwargs: Any) -> Any:
+#         if not self.id:
+#             is_unique = False
+#             while not is_unique:
+#                 id = uuid4().hex
+#                 is_unique = not self.__class__.objects.filter(id=id).exists()
 
-            self.id = id
-        return super().save(*args, **kwargs)
+#             self.id = id
+#         return super().save(*args, **kwargs)
 
 
-class IntegerIDModel(models.Model):
-    """
-    An abstract base class that allows us to generate a unique integer id for each model.
-    """
+# class IntegerIDModel(models.Model):
+#     """
+#     An abstract base class that allows us to generate a unique integer id for each model.
+#     """
 
-    id = models.CharField(primary_key=True, max_length=255, editable=False)
+#     id = models.AutoField(primary_key=True, editable=False)
 
-    class Meta:
-        abstract = True
+#     class Meta:
+#         abstract = True
 
-    def save(self, *args: Any, **kwargs: Any) -> Any:
-        if not self.id:
-            is_unique = False
-            while not is_unique:
-                id = generate_number(num_digits=12)
-                is_unique = not self.__class__.objects.filter(id=id).exists()
+#     def save(self, *args: Any, **kwargs: Any) -> Any:
+#         if not self.id:
+#             is_unique = False
+#             while not is_unique:
+#                 id = generate_number(num_digits=12)
+#                 is_unique = not self.__class__.objects.filter(id=id).exists()
 
-            self.id = id
-        return super().save(*args, **kwargs)
+#             self.id = id
+#         return super().save(*args, **kwargs)

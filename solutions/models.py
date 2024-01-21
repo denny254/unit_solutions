@@ -1,4 +1,4 @@
-from django.db import models
+
 
 # Create your models here.
 from django.db import models
@@ -11,14 +11,10 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from app.abstracts import (
-    IntegerIDModel,
-    TimeStampedModel,
-)
+from app.abstracts import TimeStampedModel 
 from app.constant import UserGroup
 
 
@@ -59,7 +55,7 @@ class CustomUserManager(BaseUserManager):
         return superuser
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel):
+class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     """
     Custom user model to replace the default Django User model.
     """
@@ -79,7 +75,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel)
     )
     email = models.EmailField(unique=True, verbose_name=_("Email Address"))
     phone = models.CharField(max_length=15, blank=True)
-    alternate_phone = models.CharField(max_length=15, blank=True)
     date_joined = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     is_active = models.BooleanField(
@@ -124,13 +119,26 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel)
         ordering = ["-date_joined"]
 
 
-# writers model for writers
+# model for writers
 class Writers(models.Model):
     name = models.CharField(max_length=255)
     specialization = models.CharField(max_length=255)
     date = models.DateField()
     email = models.EmailField()
     phone_number = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+
+# model for clients
+class Clients(models.Model):
+    company_name = models.CharField(max_length=255)
+    type_of_content = models.CharField(max_length=255)
+    project_deadline = models.DateField()
+    contact_email = models.EmailField()
+    contact_phone = models.CharField(max_length=20)
+    project_description = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name

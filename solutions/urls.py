@@ -8,6 +8,7 @@ from .views import (
     user_details,
     MyTokenObtainPairView,
     PasswordChangeManager,
+    PasswordResetManager,
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import views as auth_views
@@ -38,6 +39,12 @@ urlpatterns = [
     path("writers/<int:writer_id>/", views.get_writer, name="get_writer"),
     path("writers/update/<int:writer_id>/", views.update_writer, name="update_writer"),
     path("writers/delete/<int:writer_id>/", views.delete_writer, name="delete_writer"),
+    # writers
+    path("clients/", views.create_client, name="create_client"),
+    path("clients/all/", views.get_all_clients, name="get_all_clients"),
+    path("clients/<int:client_id>/", views.get_client, name="get_client"),
+    path("clients/update/<int:client_id>/", views.update_client, name="update_client"),
+    path("clients/delete/<int:client_id>/", views.delete_client, name="delete_client"),
     # tasks
     path("tasks/", views.task_list, name="task-list"),
     path("tasks/<int:pk>/", views.task_detail, name="task-detail"),
@@ -51,5 +58,6 @@ urlpatterns = [
         "change-password",
         PasswordChangeManager.as_view(),
         name="password_change",
-    )
+    ),
+    path("reset-password", PasswordResetManager.as_view(), name="password_reset"),
 ]
