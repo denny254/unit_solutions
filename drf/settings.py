@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-(ma!0=%dn(gqh@a0q*1x5-09sp&0e^+9pwidt%+0#7aat)jrjj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
+DEBUG = False
 
 ALLOWED_HOSTS = ["vercel.app", "*"]
 CORS_ALLOWED_ORIGINS: List[str] = []
@@ -28,12 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-
     # LOCAL_APPS
     "users",
-
-
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
     "django_rest_passwordreset",
@@ -42,13 +38,16 @@ INSTALLED_APPS = [
     "drf_yasg",
     "corsheaders",
     # "rest_framework_simplejwt.token_blacklist",
- ]
+]
 
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    
+    "django.middleware.csrf.CsrfViewMiddleware" 
     "corsheaders.middleware.CorsMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -61,6 +60,7 @@ MIDDLEWARE = [
 # Session settings
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 SESSION_COOKIE_NAME = "sessionid"
 SESSION_COOKIE_AGE = 1209600
 SESSION_COOKIE_SECURE = False
