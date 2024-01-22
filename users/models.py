@@ -1,5 +1,3 @@
-
-
 # Create your models here.
 from django.db import models
 import os
@@ -14,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from app.abstracts import TimeStampedModel 
+from app.abstracts import TimeStampedModel
 from app.constant import UserGroup
 
 
@@ -75,6 +73,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     )
     email = models.EmailField(unique=True, verbose_name=_("Email Address"))
     phone = models.CharField(max_length=15, blank=True)
+    specialization = models.CharField(
+        verbose_name=_("Specialization"), max_length=100, blank=True
+    )
     date_joined = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     is_active = models.BooleanField(

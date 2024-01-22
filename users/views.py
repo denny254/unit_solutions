@@ -1,10 +1,12 @@
-from .serializers import (
+from users.serializers import (
     WriterSerializer,
     TaskSerializer,
     ProjectSerializer,
     ClientSerializer,
+    UserSerializer,
+    MyTokenObtainPairSerializer,
 )
-from .models import Writers, Task, Project, Clients
+from .models import Writers, Task, Project, Clients, User
 from rest_framework.decorators import api_view
 
 from django.http import JsonResponse
@@ -17,24 +19,16 @@ from rest_framework.generics import (
 )
 from rest_framework import status
 from app.filters import UserInsightFilter
-from solutions.serializers import (
-    UserSerializer,
-)
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import (
     get_object_or_404,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-from solutions.serializers import MyTokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import User
 
 User = get_user_model()
 
@@ -376,7 +370,9 @@ class PasswordResetManager(APIView):
         new_password2 = request.data.get("new_password2", None)
 
         if not (new_password1 and new_password2):
-            return Response({"error": "Both new password fields are required."}, status=400)
+            return Response(
+                {"error": "Both new password fields are required."}, status=400
+            )
 
         if new_password1 != new_password2:
             return Response({"error": "Passwords do not match."}, status=400)
@@ -393,6 +389,7 @@ class PasswordResetManager(APIView):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             data={"errors": {"detail": "Internal server error"}},
         )
+
 
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
     serializer_class = MyTokenObtainPairSerializer

@@ -31,7 +31,7 @@ INSTALLED_APPS = [
 
 
     # LOCAL_APPS
-    "solutions",
+    "users",
 
 
     # THIRD_PARTY_LIBRARIES
@@ -188,7 +188,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": False,
 }
 
-AUTH_USER_MODEL = "solutions.User"
+AUTH_USER_MODEL = "users.User"
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {

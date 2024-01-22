@@ -1,7 +1,6 @@
-
 # Register your models here.
 from django.contrib import admin
-from . models import User, Project, Task, Writers, Clients
+from .models import User, Project, Task, Writers, Clients
 
 
 admin.site.register(Project),

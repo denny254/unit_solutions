@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
-from .views import (
+from users import views
+from users.views import (
     CustomUserCreateView,
     CustomUserListView,
     CustomUserRetrieveUpdateDestroyView,
