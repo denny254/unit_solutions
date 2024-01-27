@@ -4,7 +4,7 @@ from django_filters import rest_framework as filters
 
 
 User = get_user_model()
-
+#
 
 class UserInsightFilter(filters.FilterSet):
     first_name = filters.CharFilter(

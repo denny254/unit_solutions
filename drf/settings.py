@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # LOCAL_APPS
-    "users",
+    "solutions",
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
     "django_rest_passwordreset",
@@ -101,9 +101,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "railway",
         "USER": "postgres",
-        "PASSWORD": "*2FAg3BdFa-CDaD*df32eFcB3Fg4AEGa",
+        "PASSWORD": "2gedaceab1Dc3-eEA6fg*de51bAB*FD2",
         "HOST": "viaduct.proxy.rlwy.net",
-        "PORT": "55835",
+        "PORT": "31211",
     }
 }
 
@@ -187,7 +187,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": False,
 }
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "solutions.User"
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
@@ -197,7 +197,7 @@ SWAGGER_SETTINGS = {
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "unitysolutions8@gmail.com"
-EMAIL_HOST_PASSWORD = "ucdl aifj zkhj issz"
+EMAIL_HOST_USER = "aunitysolutionswebsite@gmail.com"
+EMAIL_HOST_PASSWORD = "fyam vchh tbbp nnpp"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

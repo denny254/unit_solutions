@@ -1,4 +1,7 @@
-from users.serializers import (
+from django.shortcuts import render
+
+# Create your views here.
+from solutions.serializers import (
     WriterSerializer,
     TaskSerializer,
     ProjectSerializer,
@@ -6,7 +9,7 @@ from users.serializers import (
     UserSerializer,
     MyTokenObtainPairSerializer,
 )
-from .models import Writers, Task, Project, Clients, User
+from .models import Writer, Task, Project, Client, User
 from rest_framework.decorators import api_view
 
 from django.http import JsonResponse
@@ -18,7 +21,7 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
 )
 from rest_framework import status
-from app.filters import UserInsightFilter
+from solutions.filters import UserInsightFilter
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import (
     get_object_or_404,
@@ -45,7 +48,7 @@ def create_writer(request):
 
 @api_view(["GET"])
 def get_all_writers(request):
-    writers = Writers.objects.all()
+    writers = Writer.objects.all()
     serializer = WriterSerializer(writers, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -53,8 +56,8 @@ def get_all_writers(request):
 @api_view(["GET"])
 def get_writer(request, writer_id):
     try:
-        writer = Writers.objects.get(pk=writer_id)
-    except Writers.DoesNotExist:
+        writer = Writer.objects.get(pk=writer_id)
+    except Writer.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = WriterSerializer(writer)
@@ -64,8 +67,8 @@ def get_writer(request, writer_id):
 @api_view(["PUT", "PATCH"])
 def update_writer(request, writer_id):
     try:
-        writer = Writers.objects.get(pk=writer_id)
-    except Writers.DoesNotExist:
+        writer = Writer.objects.get(pk=writer_id)
+    except Writer.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = WriterSerializer(
@@ -80,8 +83,8 @@ def update_writer(request, writer_id):
 @api_view(["DELETE"])
 def delete_writer(request, writer_id):
     try:
-        writer = Writers.objects.get(pk=writer_id)
-    except Writers.DoesNotExist:
+        writer = Writer.objects.get(pk=writer_id)
+    except Writer.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     writer.delete()
@@ -127,7 +130,7 @@ def task_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# CRUD for writers
+# CRUD for clients
 @api_view(["POST"])
 def create_client(request):
     serializer = ClientSerializer(data=request.data)
@@ -139,7 +142,7 @@ def create_client(request):
 
 @api_view(["GET"])
 def get_all_clients(request):
-    clients = Clients.objects.all()
+    clients = Client.objects.all()
     serializer = ClientSerializer(clients, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -147,8 +150,8 @@ def get_all_clients(request):
 @api_view(["GET"])
 def get_client(request, client_id):
     try:
-        client = Clients.objects.get(pk=client_id)
-    except Clients.DoesNotExist:
+        client = Client.objects.get(pk=client_id)
+    except Client.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = ClientSerializer(client)
@@ -158,8 +161,8 @@ def get_client(request, client_id):
 @api_view(["PUT", "PATCH"])
 def update_client(request, client_id):
     try:
-        client = Clients.objects.get(pk=client_id)
-    except Clients.DoesNotExist:
+        client = Client.objects.get(pk=client_id)
+    except Client.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = WriterSerializer(
@@ -174,8 +177,8 @@ def update_client(request, client_id):
 @api_view(["DELETE"])
 def delete_client(request, client_id):
     try:
-        client = Clients.objects.get(pk=client_id)
-    except Clients.DoesNotExist:
+        client = Client.objects.get(pk=client_id)
+    except Client.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     client.delete()

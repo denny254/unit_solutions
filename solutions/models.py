@@ -11,9 +11,13 @@ from django.contrib.auth.models import (
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from .abstracts import TimeStampedModel, IntegerIDModel
 
-from app.abstracts import TimeStampedModel
-from app.constant import UserGroup
+
+class UserGroup(models.IntegerChoices):
+    SUPERUSER = 300, _("Superuser")
+    ADMIN = 200, _("Admin")
+    CONSULTANT = 100, _("Consultant")
 
 
 class CustomUserManager(BaseUserManager):
@@ -29,6 +33,8 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_user(self, email: str, password: str, **kwargs: Any) -> Any:
+        kwargs.setdefault("user_group", UserGroup.USER)
+
         """Creates a regular user with a given email address and password."""
         kwargs.setdefault("is_superuser", False)
         kwargs.setdefault("is_staff", False)
@@ -40,6 +46,10 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email: str, password: str, **kwargs: Any) -> Any:
+        kwargs.setdefault("is_superuser", True)
+        kwargs.setdefault("is_staff", True)
+        kwargs.setdefault("user_group", UserGroup.SUPERUSER)
+
         """creates a superuser with a given email address and password"""
         kwargs.setdefault("is_superuser", True)
         kwargs.setdefault("is_staff", True)
@@ -53,7 +63,7 @@ class CustomUserManager(BaseUserManager):
         return superuser
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
+class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel):
     """
     Custom user model to replace the default Django User model.
     """
@@ -119,9 +129,18 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
         verbose_name_plural = "Users"
         ordering = ["-date_joined"]
 
+    def is_super_user(self):
+        return self.user_group == UserGroup.SUPERUSER
+
+    def is_admin_user(self):
+        return self.user_group == UserGroup.ADMIN
+
+    def is_regular_user(self):
+        return self.user_group == UserGroup.USER
+
 
 # model for writers
-class Writers(models.Model):
+class Writer(models.Model):
     name = models.CharField(max_length=255)
     specialization = models.CharField(max_length=255)
     date = models.DateField()
@@ -133,16 +152,15 @@ class Writers(models.Model):
 
 
 # model for clients
-class Clients(models.Model):
+class Client(models.Model):
+    country = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
-    type_of_content = models.CharField(max_length=255)
     project_deadline = models.DateField()
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=20)
-    project_description = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.name
+        return self.country
 
 
 class Task(models.Model):
@@ -158,13 +176,12 @@ class Task(models.Model):
     )
     title = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
-    writer = models.CharField(max_length=255)
-    # client = models.CharField(max_length=255)
+    writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
 
     def __str__(self):
-        return f"{self.status} - {self.writer} - {self.client}"
+        return f"{self.status} - {self.writer}"
 
 
 class Project(models.Model):
@@ -179,7 +196,7 @@ class Project(models.Model):
     )
     title = models.CharField(max_length=255)
     deadline = models.DateField()
-    client = models.CharField(max_length=255)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
         blank=True, null=True, upload_to="images", default="avator.png"

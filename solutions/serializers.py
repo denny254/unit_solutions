@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import Writers, Task, Project, Clients
+from solutions.models import Writer, Task, Project, Client
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
@@ -80,22 +80,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class WriterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Writers
+        model = Writer
         fields = ["id", "name", "specialization", "date", "email", "phone_number"]
 
 
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Clients
-        fields = [
-            "id",
-            "company_name",
-            "type_of_content",
-            "project_deadline",
-            "contact_email",
-            "contact_phone",
-            "project_description",
-        ]
+        model = Client
+        fields = "__all__"
 
 
 class TaskSerializer(serializers.ModelSerializer):

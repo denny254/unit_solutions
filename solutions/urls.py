@@ -1,6 +1,6 @@
 from django.urls import path
-from users import views
-from users.views import (
+from solutions import views
+from solutions.views import (
     CustomUserCreateView,
     CustomUserListView,
     CustomUserRetrieveUpdateDestroyView,
@@ -11,7 +11,6 @@ from users.views import (
     PasswordResetManager,
 )
 from rest_framework_simplejwt.views import TokenRefreshView
-from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
