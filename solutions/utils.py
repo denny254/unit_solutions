@@ -1,5 +1,6 @@
-from datetime import timedelta
+
 from random import randint
+from django.core.mail import EmailMessage
 
 
 def generate_number(num_digits: int = 6) -> int:
@@ -14,4 +15,12 @@ def generate_number(num_digits: int = 6) -> int:
     return number
 
 
-
+class Util:
+    @staticmethod
+    def send_email(data):
+        email = EmailMessage(
+            subject=data["email_subject"],
+            body=data["email_body"],
+            to=[data["to_email"]],
+        )
+        email.send()

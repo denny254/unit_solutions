@@ -195,11 +195,11 @@ class Project(models.Model):
         ("Pending", "Pending"),
     )
     title = models.CharField(max_length=255)
-    deadline = models.DateField()
+    # deadline = models.DateField()
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
-        blank=True, null=True, upload_to="images", default="avator.png"
+        blank=True, null=True, upload_to="ava", default="avator.png"
     )
 
     def __str__(self):

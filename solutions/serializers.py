@@ -5,6 +5,9 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 
+
+
+
 User = get_user_model()
 
 from typing import Any
@@ -77,6 +80,14 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return make_password(value)
 
+class ResetPasswordEmailRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(min_length=2)
+
+    class Meta:
+        fields = ["email"]
+
+
+        
 
 class WriterSerializer(serializers.ModelSerializer):
     class Meta:

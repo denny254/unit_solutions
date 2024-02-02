@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     "solutions",
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
-    "django_rest_passwordreset",
+    # "django_rest_passwordreset",
     "rest_framework_swagger",
     "rest_framework_simplejwt",
     "drf_yasg",
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Session settings
@@ -101,9 +101,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "railway",
         "USER": "postgres",
-        "PASSWORD": "2gedaceab1Dc3-eEA6fg*de51bAB*FD2",
-        "HOST": "viaduct.proxy.rlwy.net",
-        "PORT": "31211",
+        "PASSWORD": "Cb2aaBc3E5GddF53d261-Ec4b1F-gDgB",
+        "HOST": "roundhouse.proxy.rlwy.net",
+        "PORT": "50185",
     }
 }
 
@@ -147,7 +147,10 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 STATIC_URL = "/staticfiles/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "")]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "images")]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -195,9 +198,8 @@ SWAGGER_SETTINGS = {
     }
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "aunitysolutionswebsite@gmail.com"
-EMAIL_HOST_PASSWORD = "fyam vchh tbbp nnpp"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")

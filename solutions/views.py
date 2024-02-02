@@ -8,6 +8,7 @@ from solutions.serializers import (
     ClientSerializer,
     UserSerializer,
     MyTokenObtainPairSerializer,
+    ResetPasswordEmailRequestSerializer,
 )
 from .models import Writer, Task, Project, Client, User
 from rest_framework.decorators import api_view
@@ -18,7 +19,7 @@ from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
     ListAPIView,
-    RetrieveUpdateAPIView,
+    RetrieveUpdateDestroyAPIView,
 )
 from rest_framework import status
 from solutions.filters import UserInsightFilter
@@ -26,12 +27,24 @@ from django.contrib.auth.hashers import check_password
 from django.shortcuts import (
     get_object_or_404,
 )
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 
 from rest_framework.views import APIView
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import (
+    smart_str,
+    force_str,
+    smart_bytes,
+    DjangoUnicodeDecodeError,
+)
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+from solutions.utils import Util
 
 User = get_user_model()
 
@@ -308,7 +321,7 @@ class FindUserView(GenericAPIView):
         return Response(serializer.data)
 
 
-class CustomUserRetrieveUpdateDestroyView(RetrieveUpdateAPIView):
+class CustomUserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 
     """
      # (RetrieveUpdateDestroyAPIView):
@@ -328,6 +341,12 @@ def user_details(request, pk):
     user = get_object_or_404(User, pk=pk)
     serializer = UserSerializer(user)
     return JsonResponse(serializer.data, safe=False)
+
+
+def delete(self, request, *args, **kwargs):
+    instance = self.get_object()
+    instance.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PasswordChangeManager(APIView):
@@ -363,35 +382,44 @@ class PasswordChangeManager(APIView):
         )
 
 
-class PasswordResetManager(APIView):
-    permission_classes = [IsAuthenticated]
+
+
+
+class RequestPasswordResetEmail(generics.GenericAPIView):
+    serializer_class = ResetPasswordEmailRequestSerializer
 
     def post(self, request):
-        user = request.user
+        serializer = self.serializer_class(data=request.data)
 
-        new_password1 = request.data.get("new_password1", None)
-        new_password2 = request.data.get("new_password2", None)
+        email = request.data.get("email", "")
 
-        if not (new_password1 and new_password2):
-            return Response(
-                {"error": "Both new password fields are required."}, status=400
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            uid64 = urlsafe_base64_encode(str(user.id).encode())
+            token = PasswordResetTokenGenerator().make_token(user)
+            current_site = get_current_site(request=request).domain
+            relativeLink = reverse(
+                "password-reset-confirm", kwargs={"uidb64": uid64, "token": token}
             )
+            absurl = "https://" + current_site + relativeLink + "?token=" + str(token)
+            email_body = "Hello, \n Use link below to reset your password \n" + absurl
+            data = {
+                "email_body": email_body,
+                "to_email": user.email,
+                "email_subject": "Reset your password ",
+            }
 
-        if new_password1 != new_password2:
-            return Response({"error": "Passwords do not match."}, status=400)
+            Util.send_email(data)
 
-        # Update the user's password
-        user.set_password(new_password1)
-        user.save()
-
-        return Response({"message": "Password reset successful."}, status=200)
-
-    def handle_error(self, error):
-        # Handle the error and return an error response
         return Response(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            data={"errors": {"detail": "Internal server error"}},
+            {"success": "We have sent you a link to reset your password"},
+            status=status.HTTP_200_OK,
         )
+
+
+# class PasswordTokenCheckAPI(generics.GenericAPIView):
+#     def get(self, request, uidb64, token):
+#         pass
 
 
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
