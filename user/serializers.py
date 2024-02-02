@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from solutions.models import Writer, Task, Project, Client
+from user.models import Writer, Task, Project, Client
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers

@@ -153,9 +153,8 @@ class Writer(models.Model):
 
 # model for clients
 class Client(models.Model):
-    country = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
-    project_deadline = models.DateField()
+    country = models.CharField(max_length=255)
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=20)
 
@@ -195,7 +194,7 @@ class Project(models.Model):
         ("Pending", "Pending"),
     )
     title = models.CharField(max_length=255)
-    # deadline = models.DateField()
+    deadline = models.DateField()
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
@@ -221,3 +220,4 @@ class Project(models.Model):
     class Meta:
         verbose_name = "Project"
         verbose_name_plural = "Projects"
+

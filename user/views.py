@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-from solutions.serializers import (
+from user.serializers import (
     WriterSerializer,
     TaskSerializer,
     ProjectSerializer,
@@ -22,7 +22,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework import status
-from solutions.filters import UserInsightFilter
+from user.filters import UserInsightFilter
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import (
     get_object_or_404,
@@ -44,7 +44,7 @@ from django.utils.encoding import (
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from solutions.utils import Util
+from user.utils import Util
 
 User = get_user_model()
 
@@ -424,3 +424,4 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
     serializer_class = MyTokenObtainPairSerializer
+

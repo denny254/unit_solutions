@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # LOCAL_APPS
-    "solutions",
+    "user",
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
     # "django_rest_passwordreset",
@@ -101,9 +101,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "railway",
         "USER": "postgres",
-        "PASSWORD": "Cb2aaBc3E5GddF53d261-Ec4b1F-gDgB",
-        "HOST": "roundhouse.proxy.rlwy.net",
-        "PORT": "50185",
+        "PASSWORD": "f25BG3abegcd4-DADc2-D-2eGc2B6fDb",
+        "HOST": "monorail.proxy.rlwy.net",
+        "PORT": "12800",
     }
 }
 
@@ -190,7 +190,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": False,
 }
 
-AUTH_USER_MODEL = "solutions.User"
+AUTH_USER_MODEL = "user.User"
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
