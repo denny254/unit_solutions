@@ -144,58 +144,42 @@ def task_detail(request, pk):
 
 
 # CRUD for clients
-@api_view(["POST"])
-def create_client(request):
-    serializer = ClientSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET"])
-def get_all_clients(request):
-    clients = Client.objects.all()
-    serializer = ClientSerializer(clients, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-def get_client(request, client_id):
-    try:
-        client = Client.objects.get(pk=client_id)
-    except Client.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ClientSerializer(client)
-    return Response(serializer.data)
-
-
-@api_view(["PUT", "PATCH"])
-def update_client(request, client_id):
-    try:
-        client = Client.objects.get(pk=client_id)
-    except Client.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serializer = WriterSerializer(
-        client, data=request.data, partial=True if request.method == "PATCH" else False
-    )
-    if serializer.is_valid():
-        serializer.save()
+@api_view(["GET", "POST"])
+def client_list(request):
+    if request.method == "GET":
+        clients = Client.objects.all()
+        serializer = ClientSerializer(clients, many=True)
         return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "POST":
+        serializer = ClientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["DELETE"])
-def delete_client(request, client_id):
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def client_detail(request, pk):
     try:
-        client = Client.objects.get(pk=client_id)
+        client = Client.objects.get(pk=pk)
     except Client.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    client.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    if request.method == "GET":
+        serializer = ClientSerializer(client)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = ClientSerializer(client, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        client.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # CRUD for tasks
@@ -382,9 +366,6 @@ class PasswordChangeManager(APIView):
         )
 
 
-
-
-
 class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
 
@@ -424,4 +405,3 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
     serializer_class = MyTokenObtainPairSerializer
-
