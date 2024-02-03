@@ -5,9 +5,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 
-
-
-
 User = get_user_model()
 
 from typing import Any
@@ -87,8 +84,6 @@ class ResetPasswordEmailRequestSerializer(serializers.Serializer):
         fields = ["email"]
 
 
-        
-
 class WriterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Writer
@@ -104,7 +99,7 @@ class ClientSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["id", "title", "status", "writer", "book_balance", "deadline"]
+        fields = "__all__"
 
 
 class ProjectSerializer(serializers.ModelSerializer):

@@ -154,36 +154,17 @@ class Writer(models.Model):
 # model for clients
 class Client(models.Model):
     company_name = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=20)
+    country = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.country
-
-
-class Task(models.Model):
-    STATUS_CHOICES = (
-        ("New", "New"),
-        ("Approved", "Approved"),
-        ("Completed", "Completed"),
-        ("Rejected", "Rejected"),
-        ("Cancelled", "Cancelled"),
-        ("Revision", "Revision"),
-        ("Resubmission", "Resubmission"),
-        ("Pending", "Pending"),
-    )
-    title = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
-    writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
-    book_balance = models.CharField(max_length=255)
-    deadline = models.DateField()
-
-    def __str__(self):
-        return f"{self.status} - {self.writer}"
+        return self.company_name
 
 
 class Project(models.Model):
+    title = models.CharField(max_length=255)
     STATUS_CHOICES = (
         ("New", "New"),
         ("Completed", "Completed"),
@@ -193,7 +174,7 @@ class Project(models.Model):
         ("Resubmission", "Resubmission"),
         ("Pending", "Pending"),
     )
-    title = models.CharField(max_length=255)
+
     deadline = models.DateField()
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
@@ -202,7 +183,7 @@ class Project(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        return f'{self.title} - {self.client} '
 
     def delete_old_file(self):
         if self.attachment:
@@ -221,3 +202,24 @@ class Project(models.Model):
         verbose_name = "Project"
         verbose_name_plural = "Projects"
 
+
+class Task(models.Model):
+    STATUS_CHOICES = (
+        ("New", "New"),
+        ("Approved", "Approved"),
+        ("Completed", "Completed"),
+        ("Rejected", "Rejected"),
+        ("Cancelled", "Cancelled"),
+        ("Revision", "Revision"),
+        ("Resubmission", "Resubmission"),
+        ("Pending", "Pending"),
+    )
+    # title = models.CharField(max_length=255)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
+    writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
+    book_balance = models.CharField(max_length=255)
+    deadline = models.DateField()
+
+    def __str__(self):
+        return f"{self.title} - {self.writer}"
