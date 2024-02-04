@@ -397,9 +397,9 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         )
 
 
-# class PasswordTokenCheckAPI(generics.GenericAPIView):
-#     def get(self, request, uidb64, token):
-#         pass
+class PasswordTokenCheckAPI(generics.GenericAPIView):
+    def get(self, request, uidb64, token):
+        pass
 
 
 class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
