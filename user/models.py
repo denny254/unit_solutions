@@ -214,12 +214,11 @@ class Task(models.Model):
         ("Resubmission", "Resubmission"),
         ("Pending", "Pending"),
     )
-    # title = models.CharField(max_length=255)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    title = models.ForeignKey(Project, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
 
     def __str__(self):
-        return f"{self.project} - {self.writer}"
+        return f"{self.title} - {self.writer}"
