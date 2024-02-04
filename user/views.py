@@ -232,7 +232,7 @@ def project_list(request):
     elif request.method == "POST":
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(attachment=request.FILES.get("projects"))
+            serializer.save(attachment=request.FILES.get("attachment"))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -252,10 +252,9 @@ def project_detail(request, pk):
     elif request.method == "PUT":
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
-            new_attachment = request.data.get("attachment")
+            new_attachment = request.FILES.get("attachment")
             if new_attachment:
-                project.attachment.delete()
-                project.attachment = new_attachment
+                project.attachment.delete()  # Delete old file if a new one is provided
             serializer.save(attachment=new_attachment)
             return Response(serializer.data)
 

@@ -179,7 +179,7 @@ class Project(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
-        blank=True, null=True, upload_to="ava", default="avator.png"
+        blank=True, null=True, upload_to="ava"
     )
 
     def __str__(self):
