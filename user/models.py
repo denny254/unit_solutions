@@ -176,7 +176,7 @@ class Project(models.Model):
     )
 
     deadline = models.DateField()
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
     attachment = models.FileField(
         blank=True, null=True, upload_to="ava"
@@ -214,9 +214,9 @@ class Task(models.Model):
         ("Resubmission", "Resubmission"),
         ("Pending", "Pending"),
     )
-    title = models.ForeignKey(Project, on_delete=models.CASCADE)
+    title = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
-    writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
+    writer = models.CharField(max_length=255)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
 
