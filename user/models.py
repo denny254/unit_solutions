@@ -222,4 +222,4 @@ class Task(models.Model):
     deadline = models.DateField()
 
     def __str__(self):
-        return f"{self.title} - {self.writer}"
+        return f"{self.project} - {self.writer}"
