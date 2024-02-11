@@ -7,44 +7,40 @@ from user.serializers import (
     ProjectSerializer,
     ClientSerializer,
     UserSerializer,
-    MyTokenObtainPairSerializer,
-    ResetPasswordEmailRequestSerializer,
+    MyTokenObtainPairSerializer
 )
 from .models import Writer, Task, Project, Client, User
 from rest_framework.decorators import api_view
-
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
     ListAPIView,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateDestroyAPIView
 )
 from rest_framework import status
 from user.filters import UserInsightFilter
 from django.contrib.auth.hashers import check_password
-from django.shortcuts import (
-    get_object_or_404,
-)
-from rest_framework import generics
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
-
 from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import (
-    smart_str,
-    force_str,
-    smart_bytes,
-    DjangoUnicodeDecodeError,
-)
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_str
+from django.core.exceptions import ValidationError
+from django.utils.http import urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
-from user.utils import Util
+from .email_confirmation import (
+    EmailActivationTokenGenerator,
+    send_email_confirmation_email,
+)
+from .forms import (
+    CustomPasswordResetForm,
+    PasswordSetForm,
+)
 
 User = get_user_model()
 
@@ -365,42 +361,288 @@ class PasswordChangeManager(APIView):
         )
 
 
-class RequestPasswordResetEmail(generics.GenericAPIView):
-    serializer_class = ResetPasswordEmailRequestSerializer
+class MyTokenObtainPairView(TokenObtainPairView):  
+    serializer_class = MyTokenObtainPairSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+def resend_confirmation_email(request, uidb64):
+    uid = force_str(urlsafe_base64_decode(uidb64))
+    user = get_object_or_404(get_user_model(), id=uid)
 
-        email = request.data.get("email", "")
+    if send_email_confirmation_email(
+        request=request,
+        user=user,
+        receiver_email=user.email,
+        receiver_name=f"{user.first_name} {user.last_name}",
+        app_name="Unitsolutions App",
+    ):
+        context = {
+            "page_title": "Confirmation email",
+            "message_title": "Success!!",
+            "message_content": "A confirmation email has been sent.",
+        }
 
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-            uid64 = urlsafe_base64_encode(str(user.id).encode())
-            token = PasswordResetTokenGenerator().make_token(user)
-            current_site = get_current_site(request=request).domain
-            relativeLink = reverse(
-                "password-reset-confirm", kwargs={"uidb64": uid64, "token": token}
-            )
-            absurl = "https://" + current_site + relativeLink + "?token=" + str(token)
-            email_body = "Hello, \n Use link below to reset your password \n" + absurl
-            data = {
-                "email_body": email_body,
-                "to_email": user.email,
-                "email_subject": "Reset your password ",
+    else:
+        context = {
+            "page_title": "Confirmation email",
+            "message_title": "Oops!!",
+            "message_content": "Sorry we were unable to send confirmation"
+            "email.",
+        }
+
+    return render(request, "message-page.html", context)
+
+
+class EmailActivationManager(APIView):
+    def get(self, request):
+        uidb64 = request.GET.get("uidb64")
+        token = request.GET.get("token")
+
+        if uidb64 is None or token is None:
+            context = {
+                "status": "error",
+                "page_title": "Invalid link",
+                "message_title": "Oops!!",
+                "message_content": "The link you clicked is invalid.",
             }
 
-            Util.send_email(data)
+            return render(request, "message-page.html", context)
 
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_object_or_404(get_user_model(), id=uid)
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            User.DoesNotExist,
+            ValidationError,
+            Exception,
+        ):
+            context = {
+                "status": "error",
+                "page_title": "Invalid link",
+                "message_title": "Oops!!",
+                "message_content": "The link you clicked is invalid.",
+            }
+
+            return render(request, "message-page.html", context)
+        confirmed = False
+
+        if EmailActivationTokenGenerator().check_token(user, token):
+            user.is_active = True
+            user.save()
+            confirmed = True
+
+        context = {
+            "is_active": user.is_active,
+            "uidb64": uidb64,
+            "confirmed": confirmed,
+        }
+        return render(
+            request,
+            "email-activation-result.html",
+            context,
+        )
+
+    def post(self, request):
+        try:
+            errors = {}
+
+            action = request.data.get("action")
+            if action is None or action == "":
+                errors = {**errors, "action": ["This value is required"]}
+
+            uidb64 = request.data.get("uidb64")
+            if uidb64 is None or uidb64 == "":
+                errors = {**errors, "uidb64": ["This value is required"]}
+
+            token = request.data.get("token")
+            if token is None or token == "":
+                errors = {**errors, "token": ["This value is required"]}
+
+            if len(errors) > 0:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST, data={"errors": errors}
+                )
+
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_user_model().objects.get(id=uid)
+
+            if action == "confirm":
+                if EmailActivationTokenGenerator().check_token(user, token):
+                    user.is_active = True
+                    user.save()
+                    return Response(
+                        status=status.HTTP_200_OK,
+                        data={
+                            "messages": {
+                                "detail": "Email address confirmed "
+                                "successfully"
+                            }
+                        },
+                    )
+
+                else:
+                    return Response(
+                        status=status.HTTP_400_BAD_REQUEST,
+                        data={
+                            "errors": {
+                                "detail": "Invalid link, It could be that "
+                                "the confirmation link has already "
+                                "make been used or the link has expired."
+                            },
+                            "data": {
+                                "uidb64": uidb64,
+                                "user_account_active": user.is_active,
+                            },
+                        },
+                    )
+
+            elif action == "resend-email":
+                if send_email_confirmation_email(
+                    request=request,
+                    user=user,
+                    receiver_email=user.email,
+                    receiver_name=f"{user.first_name} {user.last_name}",
+                    app_name="App in App",
+                ):
+                    return Response(
+                        status=status.HTTP_200_OK,
+                        data={
+                            "messages": {
+                                "detail": "Confirmation email sent "
+                                "successfully"
+                            }
+                        },
+                    )
+
+                else:
+                    return Response(
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={
+                            "errors": {
+                                "detail": "Confirmation email sending failed"
+                            }
+                        },
+                    )
+
+            else:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"errors": {"action": "Invalid action"}},
+                )
+
+        except get_user_model().DoesNotExist:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "errors": {
+                        "uidb64": "User with the given id does not exist"
+                    }
+                },
+            )
+
+        except Exception as e:
+            return self.handle_error(e)
+
+    def handle_error(self, error):
+        # Handle the error and return an error response
         return Response(
-            {"success": "We have sent you a link to reset your password"},
-            status=status.HTTP_200_OK,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"errors": {"detail": "Internal server error"}},
         )
 
 
-class PasswordTokenCheckAPI(generics.GenericAPIView):
-    def get(self, request, uidb64, token):
-        pass
+def confirm_email_address_set_password(request, uidb64, token):
+    uid = force_str(urlsafe_base64_decode(uidb64))
+    user = get_object_or_404(get_user_model(), id=uid)
+
+    if PasswordResetTokenGenerator().check_token(user, token):
+        if request.method == "GET":
+            form = PasswordSetForm()
+
+            context = {
+                "form": form,
+                "title": "Set a new password",
+            }
+            return render(request, "password-set.html", context)
+
+        elif request.method == "POST":
+            filled_form = PasswordSetForm(request.POST)
+
+            if filled_form.is_valid():
+                user.set_password(filled_form.cleaned_data["password"])
+                user.is_active = True
+                user.save()
+
+                context = {
+                    "page_title": "Set password",
+                    "message_title": "Success!!",
+                    "message_content": "Your password has been set "
+                    "successfully, you can now log in to "
+                    "your account.",
+                }
+
+                return render(
+                    request,
+                    "message-page.html",
+                    context,
+                )
+
+            else:
+                form = filled_form
+                context = {
+                    "form": form,
+                    "title": "Set a new password",
+                }
+
+                return render(
+                    request,
+                    "set-password.html",
+                    context,
+                )
+
+    context = {
+        "page_title": "Set password",
+        "message_title": "Oops!!",
+        "message_content": "The link you clicked is invalid, it may be that "
+        "the link has already been used or has"
+        "expired. Please contact your admin to resend an activation link",
+    }
+
+    return render(request, "message-page.html", context)
 
 
-class MyTokenObtainPairView(TokenObtainPairView):  # type: ignore
-    serializer_class = MyTokenObtainPairSerializer
+class PasswordResetRequestManager(APIView):
+    def post(self, request):
+        try:
+            form = CustomPasswordResetForm(request.data)
+            if form.is_valid():
+                form.save(
+                    domain_override=get_current_site(request).domain,
+                    app_name="unity-solutions.app",
+                )
+
+                return Response(
+                    {
+                        "messages": {
+                            "detail": "If an account with that email exists, you will receive an "
+                            "email with further instructions to reset your password"
+                        }
+                    }
+                )
+            else:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"errors": form.errors},
+                )
+
+        except Exception as e:
+            return self.handle_error(e)
+
+    def handle_error(self, error):
+        # Handle the error and return an error response
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"errors": {"detail": "Internal server error"}},
+        )

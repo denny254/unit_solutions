@@ -2,8 +2,6 @@ from rest_framework import serializers
 from user.models import Writer, Task, Project, Client
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from rest_framework import serializers
-
 
 User = get_user_model()
 
@@ -12,7 +10,7 @@ from typing import Any
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):  # type: ignore
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):  
     @classmethod
     def get_token(cls, user: Any) -> Any:
         token = super().get_token(user)

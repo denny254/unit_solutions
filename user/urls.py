@@ -8,8 +8,17 @@ from user.views import (
     user_details,
     MyTokenObtainPairView,
     PasswordChangeManager,
-    PasswordTokenCheckAPI,
-    RequestPasswordResetEmail,
+   
+   EmailActivationManager,
+    MyTokenObtainPairView,
+    PasswordChangeManager,
+    PasswordResetRequestManager,
+    confirm_email_address_set_password,
+    resend_confirmation_email,
+)
+from django.contrib.auth.views import (
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -56,19 +65,41 @@ urlpatterns = [
         PasswordChangeManager.as_view(),
         name="password_change",
     ),
-    path(
-        "password-reset-email/",
-        RequestPasswordResetEmail.as_view(),
-        name="password-reset-email",
+     path(
+        "confirm-email/",
+        EmailActivationManager.as_view(),
+        name="email_confirmation",
     ),
     path(
-        "password-reset/<str:uidb64>/<str:token>/",
-        PasswordTokenCheckAPI.as_view(),
-        name="password-reset-confirm",
+        "resend-confirmation-email/<uidb64>/",
+        resend_confirmation_email,
+        name="resend_confirmation_email",
     ),
-    # path(
-    #     "password-reset-complete/",
-    #     views.SetNewPasswordAPIView.as_view(),
-    #     name="password-reset-complete",
-    # ),
+    path(
+        "confirm-email-set-password/<uidb64>/<token>/",
+        confirm_email_address_set_password,
+        name="confirm_email_address_set_password",
+    ),
+    path(
+        "reset-password/",
+        PasswordResetRequestManager.as_view(),
+        name="password_reset_request",
+    ),
+    path(
+        "reset-password/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(template_name="reset-password.html"),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset-password/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset-password/done/",
+        PasswordResetCompleteView.as_view(
+            template_name="password-reset-done.html"
+        ),
+        name="password_reset_complete",
+    ),
 ]

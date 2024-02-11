@@ -3,6 +3,11 @@ import os
 from datetime import timedelta
 from typing import List
 
+
+
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,7 +19,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-(ma!0=%dn(gqh@a0q*1x5-09sp&0e^+9pwidt%+0#7aat)jrjj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True 
+
+
 
 ALLOWED_HOSTS = ["vercel.app", "*"]
 CORS_ALLOWED_ORIGINS: List[str] = []
@@ -32,8 +39,7 @@ INSTALLED_APPS = [
     "user",
     # THIRD_PARTY_LIBRARIES
     "rest_framework",
-    # "django_rest_passwordreset",
-    "rest_framework_swagger",
+    # "rest_framework_swagger",
     "rest_framework_simplejwt",
     "drf_yasg",
     "corsheaders",
@@ -149,8 +155,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 STATIC_URL = "/staticfiles/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "media/ava")]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = "aunitysolutionswebsite@gmail.com"
+EMAIL_HOST_PASSWORD = "ehuuwsahzmqqlwws"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -178,7 +192,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 15,
+    "PAGE_SIZE": 1000,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
@@ -187,7 +201,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 AUTH_USER_MODEL = "user.User"
@@ -198,8 +212,5 @@ SWAGGER_SETTINGS = {
     }
 }
 
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+
