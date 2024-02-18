@@ -219,6 +219,8 @@ class Task(models.Model):
     writer = models.CharField(max_length=255)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
+   
+    
 
     def __str__(self):
         return f"{self.title} - {self.writer}"

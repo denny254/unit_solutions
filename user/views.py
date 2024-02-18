@@ -41,6 +41,8 @@ from .forms import (
     CustomPasswordResetForm,
     PasswordSetForm,
 )
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
@@ -102,9 +104,11 @@ def delete_writer(request, writer_id):
 
 # CRUD for tasks
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def task_list(request):
     if request.method == "GET":
-        tasks = Task.objects.all()
+        user = request.user
+        tasks = Task.objects.filter(writer=user)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
@@ -117,11 +121,16 @@ def task_list(request):
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
+@permission_classes([IsAuthenticated])
 def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
     except Task.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if task.writer != request.user:
+       return Response({"message": "You don't have permission to access this task"}, status=status.HTTP_403_FORBIDDEN)
+
 
     if request.method == "GET":
         serializer = TaskSerializer(task)
