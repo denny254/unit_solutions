@@ -41,6 +41,7 @@ from .forms import (
     CustomPasswordResetForm,
     PasswordSetForm,
 )
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -137,6 +138,7 @@ def task_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == "PUT":
+        
         serializer = TaskSerializer(task, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -198,7 +200,7 @@ def task_list(request):
     elif request.method == "POST":
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(writer=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -333,6 +335,10 @@ def user_details(request, pk):
 
 def delete(self, request, *args, **kwargs):
     instance = self.get_object()
+
+    if instance != request.user:
+            raise PermissionDenied("You don't have permission to delete this user.")
+        
     instance.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
