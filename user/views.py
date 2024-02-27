@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import generics
 
 # Create your views here.
 from user.serializers import (
@@ -226,7 +227,18 @@ def task_detail(request, pk):
     elif request.method == "DELETE":
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class UserTaskListView(generics.ListAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
 
+    def get_queryset(self):
+        user_id = self.kwargs.get("user_id")
+        if user_id is not None:
+            # Filter tasks based on the provided user_id
+            return Task.objects.filter(user_id=user_id)
+        # If no user_id is provided, return an empty queryset
+        return Task.objects.none()
 
 # CRUD for projects
 @api_view(["GET", "POST"])
