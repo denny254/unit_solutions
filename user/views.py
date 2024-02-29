@@ -106,7 +106,6 @@ def delete_writer(request, writer_id):
 
 # CRUD for tasks
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
 def task_list(request):
     if request.method == "GET":
         user = request.user
@@ -126,7 +125,7 @@ def task_list(request):
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
-@permission_classes([IsAuthenticated])
+
 def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
