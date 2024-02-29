@@ -115,6 +115,9 @@ def task_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
+
+        # populating the writer field with the current user
+        request.data["writer"] = request.user.id
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -150,6 +153,18 @@ def task_detail(request, pk):
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class TaskListView(APIView):
+    def get(self, request, user_id):
+       
+        user = get_object_or_404(User, id=user_id)
+        tasks = Task.objects.filter(writer=user)
+        serializer = TaskSerializer(tasks, many=True)
+        print(serializer.data)
+        
+        return Response(serializer.data)
+    
+
+
 
 # CRUD for clients
 @api_view(["GET", "POST"])
@@ -160,6 +175,7 @@ def client_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
+        
         serializer = ClientSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -190,56 +206,9 @@ def client_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# CRUD for tasks
-@api_view(["GET", "POST"])
-def task_list(request):
-    if request.method == "GET":
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
-def task_detail(request, pk):
-    try:
-        task = Task.objects.get(pk=pk)
-    except Task.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
-
-    elif request.method == "PUT":
-        serializer = TaskSerializer(task, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == "DELETE":
-        task.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-class UserTaskListView(generics.ListAPIView):
-    serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
-
-    def get_queryset(self):
-        user_id = self.kwargs.get("user_id")
-        if user_id is not None:
-            # Filter tasks based on the provided user_id
-            return Task.objects.filter(user_id=user_id)
-        # If no user_id is provided, return an empty queryset
-        return Task.objects.none()
-
+       
 # CRUD for projects
 @api_view(["GET", "POST"])
 def project_list(request):

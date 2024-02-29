@@ -8,7 +8,7 @@ from user.views import (
     user_details,
     MyTokenObtainPairView,
     PasswordChangeManager,
-    UserTaskListView,
+    TaskListView,
     EmailActivationManager,
     MyTokenObtainPairView,
     PasswordChangeManager,
@@ -54,7 +54,7 @@ urlpatterns = [
     # tasks
     path("tasks/", views.task_list, name="task-list"),
     path("tasks/<int:pk>/", views.task_detail, name="task-detail"),
-    path('task/<int:user_id>/', UserTaskListView.as_view(), name='user_task_list'),
+    path('task/<int:user_id>/', TaskListView.as_view(), name='user_task_list'),
     # projects
     path("projects/", views.project_list, name="project-list"),
     path("projects/<int:pk>/", views.project_detail, name="project-detail"),

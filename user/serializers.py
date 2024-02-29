@@ -99,6 +99,15 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        # Extract the user ID from the context
+        user_id = kwargs.pop('user_id', None)
+        super(TaskSerializer, self).__init__(*args, **kwargs)
+        
+        # Filter tasks based on the user ID
+        if user_id is not None:
+            self.fields['assigned_to'].queryset = self.fields['assigned_to'].queryset.filter(id=user_id)
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
