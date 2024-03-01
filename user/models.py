@@ -10,6 +10,7 @@ from django.contrib.auth.models import (
 )
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.conf import settings
 from django.utils.translation import gettext as _
 from .abstracts import TimeStampedModel, IntegerIDModel
 
@@ -216,11 +217,11 @@ class Task(models.Model):
     )
     title = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
-    writer = models.CharField(max_length=255)
+    writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
    
     
 
     def __str__(self):
-        return f"{self.title} - {self.writer}"
+        return f"{self.title} - {self.writer.email}"

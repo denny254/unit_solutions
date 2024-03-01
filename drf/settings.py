@@ -53,6 +53,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+
+     "django.middleware.csrf.CsrfViewMiddleware", 
+     
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -107,9 +110,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "railway",
         "USER": "postgres",
-        "PASSWORD": "ag5B3eA24ee2D5eAEGFFGb12GcAgBG2-",
+        "PASSWORD": "c*3CbG1FdGfc2EcAaEBAadFEBBfbA35b",
         "HOST": "roundhouse.proxy.rlwy.net",
-        "PORT": "35753",
+        "PORT": "38108",
     }
 }
 

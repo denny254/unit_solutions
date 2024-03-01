@@ -114,18 +114,24 @@ def task_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
-
-        # populating the writer field with the current user
-        request.data["writer"] = request.user.id
+        # request.data["writer"] = request.user.id
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
+def user_specific_tasks(request, user_id):
+    try:
+        tasks = Task.objects.filter(writer_id=user_id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+    except Task.DoesNotExist:
+        return Response({"message": "Tasks not found for the specified user"}, status=404)
+    
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
-
 def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
@@ -135,13 +141,11 @@ def task_detail(request, pk):
     if task.writer != request.user:
        return Response({"message": "You don't have permission to access this task"}, status=status.HTTP_403_FORBIDDEN)
 
-
     if request.method == "GET":
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
-    elif request.method == "PUT":
-        
+    elif request.method in ["PUT", "PATCH"]:
         serializer = TaskSerializer(task, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -151,17 +155,6 @@ def task_detail(request, pk):
     elif request.method == "DELETE":
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class TaskListView(APIView):
-    def get(self, request, user_id):
-       
-        user = get_object_or_404(User, id=user_id)
-        tasks = Task.objects.filter(writer=user)
-        serializer = TaskSerializer(tasks, many=True)
-        print(serializer.data)
-        
-        return Response(serializer.data)
-    
 
 
 
