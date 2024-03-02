@@ -2,6 +2,7 @@ from rest_framework import serializers
 from user.models import Writer, Task, Project, Client
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 
 User = get_user_model()
 
@@ -93,10 +94,26 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = "__all__"
 
+
+class FullNameToUserSerializer(serializers.Serializer):
+    """
+    Serializer field that converts full name to User object.
+    """
+
+    def to_internal_value(self, data):
+        # Assuming the full name is in the format "first_name last_name"
+        first_name, last_name = data.split(" ", 1)
+        try:
+            user = User.objects.get(first_name=first_name, last_name=last_name)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with the provided full name does not exist.")
+        return user
+
+    def to_representation(self, value):
+        return f"{value.first_name} {value.last_name}"
+
 class TaskSerializer(serializers.ModelSerializer):
-
-    writer = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
+    writer = FullNameToUserSerializer()
 
     class Meta:
         model = Task

@@ -114,13 +114,18 @@ def task_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
-        # request.data["writer"] = request.user.id
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            writer_full_name = serializer.validated_data.pop('writer')
+            # Find the corresponding user object based on the full name
+            try:
+                writer = User.objects.get(first_name=writer_full_name.first_name, last_name=writer_full_name.last_name)
+            except User.DoesNotExist:
+                return Response({"writer": ["User with the provided full name does not exist."]}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(writer=writer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
 @api_view(["GET"])
 def user_specific_tasks(request, user_id):
     try:
