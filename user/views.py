@@ -8,9 +8,10 @@ from user.serializers import (
     ProjectSerializer,
     ClientSerializer,
     UserSerializer,
-    MyTokenObtainPairSerializer
+    MyTokenObtainPairSerializer,
+    SubmitTaskSerializer,
 )
-from .models import Writer, Task, Project, Client, User
+from .models import Writer, Task, Project, Client, User, SubmitTask
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -212,9 +213,8 @@ def project_list(request):
     elif request.method == "POST":
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(attachment=request.FILES.get("attachment"))
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -229,19 +229,55 @@ def project_detail(request, pk):
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
 
-    elif request.method == "PUT":
-        serializer = ProjectSerializer(project, data=request.data)
+    elif request.method in ["PUT", "PATCH"]:
+        serializer = ProjectSerializer(
+            project, data=request.data, partial=request.method == "PATCH"
+        )
         if serializer.is_valid():
-            new_attachment = request.FILES.get("attachment")
-            if new_attachment:
-                project.attachment.delete()  # Delete old file if a new one is provided
-            serializer.save(attachment=new_attachment)
+            serializer.save()
             return Response(serializer.data)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == "DELETE":
         project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# CRUD for SubmitTask
+@api_view(["GET", "POST"])
+def submit_task_list(request):
+    if request.method == "GET":
+        submit_tasks = SubmitTask.objects.all()
+        serializer = SubmitTaskSerializer(submit_tasks, many=True)
+        return Response(serializer.data)
+    elif request.method == "POST":
+        serializer = SubmitTaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def submit_task_detail(request, pk):
+    try:
+        submit_task = SubmitTask.objects.get(pk=pk)
+    except SubmitTask.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = SubmitTaskSerializer(submit_task)
+        return Response(serializer.data)
+    elif request.method in ["PUT", "PATCH"]:
+        serializer = SubmitTaskSerializer(
+            submit_task, data=request.data, partial=request.method == "PATCH"
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        submit_task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

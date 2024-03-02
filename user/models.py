@@ -179,25 +179,13 @@ class Project(models.Model):
     deadline = models.DateField()
     client = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="New")
-    attachment = models.FileField(
-        blank=True, null=True, upload_to="ava"
+    attachment = models.URLField(
+        blank=True, null=True
     )
 
     def __str__(self):
-        return f'{self.title} - {self.client} '
+        return f'{self.title} - {self.client}'
 
-    def delete_old_file(self):
-        if self.attachment:
-            old_file = self.attachment.path
-
-            if os.path.isfile(old_file):
-                print(f"Deleting old file {old_file}")
-                os.remove(old_file)
-
-    def save(self, *args, **kwargs):
-        self.delete_old_file()
-        super().save(*args, **kwargs)
-        print("New file saved")
 
     class Meta:
         verbose_name = "Project"
@@ -220,8 +208,16 @@ class Task(models.Model):
     writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     book_balance = models.CharField(max_length=255)
     deadline = models.DateField()
-   
-    
 
     def __str__(self):
         return f"{self.title} - {self.writer.email}"
+
+
+class SubmitTask(models.Model):
+    title = models.CharField(max_length=255)
+    writer_email = models.EmailField()
+    date_submitted = models.DateField()
+    project_link = models.URLField()
+
+    def __str__(self):
+        return self.title

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user.models import Writer, Task, Project, Client
+from user.models import Writer, Task, Project, Client, SubmitTask
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
@@ -122,9 +122,15 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"
-    
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
+        fields = "__all__"
+
+
+class SubmitTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmitTask
         fields = "__all__"

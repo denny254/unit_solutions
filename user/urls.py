@@ -53,7 +53,17 @@ urlpatterns = [
     # tasks
     path("tasks/", views.task_list, name="task-list"),
     path("tasks/<int:pk>/", views.task_detail, name="task-detail"),
-    path('tasks/user-specific/<str:user_id>/',views.user_specific_tasks, name='user-specific-tasks'),
+    path(
+        "tasks/user-specific/<str:user_id>/",
+        views.user_specific_tasks,
+        name="user-specific-tasks",
+    ),
+
+    # submitting a task
+    path("submit-task/", views.submit_task_list, name="submit_task_list"),
+    path("submit-task/<int:pk>/", views.submit_task_detail, name="submit_task_detail"),
+
+    
     # projects
     path("projects/", views.project_list, name="project-list"),
     path("projects/<int:pk>/", views.project_detail, name="project-detail"),
@@ -65,7 +75,7 @@ urlpatterns = [
         PasswordChangeManager.as_view(),
         name="password_change",
     ),
-     path(
+    path(
         "confirm-email/",
         EmailActivationManager.as_view(),
         name="email_confirmation",
@@ -97,9 +107,7 @@ urlpatterns = [
     ),
     path(
         "reset-password/done/",
-        PasswordResetCompleteView.as_view(
-            template_name="password-reset-done.html"
-        ),
+        PasswordResetCompleteView.as_view(template_name="password-reset-done.html"),
         name="password_reset_complete",
     ),
 ]
