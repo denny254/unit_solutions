@@ -108,8 +108,7 @@ def delete_writer(request, writer_id):
 @api_view(["GET", "POST"])
 def task_list(request):
     if request.method == "GET":
-        user = request.user
-        tasks = Task.objects.filter(writer=user)
+        tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 

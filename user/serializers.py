@@ -101,6 +101,10 @@ class FullNameToUserSerializer(serializers.Serializer):
     """
 
     def to_internal_value(self, data):
+        # Check if data is empty or does not contain a space-separated full name
+        if not data or ' ' not in data:
+            raise serializers.ValidationError("Invalid full name format.")
+        
         # Assuming the full name is in the format "first_name last_name"
         first_name, last_name = data.split(" ", 1)
         try:
@@ -118,7 +122,6 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"
-
     
 
 class ProjectSerializer(serializers.ModelSerializer):
