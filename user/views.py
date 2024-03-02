@@ -44,7 +44,8 @@ from .forms import (
 )
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
 
 User = get_user_model()
 
@@ -124,7 +125,7 @@ def task_list(request):
             serializer.save(writer=writer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 @api_view(["GET"])
 def user_specific_tasks(request, user_id):
     try:
@@ -133,33 +134,39 @@ def user_specific_tasks(request, user_id):
         return Response(serializer.data)
     except Task.DoesNotExist:
         return Response({"message": "Tasks not found for the specified user"}, status=404)
-    
+
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
+@permission_classes([IsAuthenticated])
 def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
     except Task.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if task.writer != request.user:
-       return Response({"message": "You don't have permission to access this task"}, status=status.HTTP_403_FORBIDDEN)
 
-    if request.method == "GET":
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
-
-    elif request.method in ["PUT", "PATCH"]:
-        serializer = TaskSerializer(task, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+    # Check if the user is the writer of the task or is an admin user
+    if request.user.is_staff or task.writer == request.user:
+        if request.method == "GET":
+            serializer = TaskSerializer(task)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "DELETE":
-        task.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        elif request.method in ["PUT", "PATCH"]:
+            serializer = TaskSerializer(
+                task, data=request.data, partial=request.method == "PATCH"
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        elif request.method == "DELETE":
+            task.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+    else:
+        return Response(
+            {"message": "You don't have permission to access this task"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
 
 
 # CRUD for clients
@@ -202,9 +209,6 @@ def client_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
-
-       
 # CRUD for projects
 @api_view(["GET", "POST"])
 def project_list(request):
