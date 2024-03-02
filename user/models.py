@@ -83,7 +83,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, IntegerIDModel)
         verbose_name=_("Last Name"), max_length=30, blank=False
     )
     email = models.EmailField(unique=True, verbose_name=_("Email Address"))
-    phone = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(max_length=15, blank=True, unique=True)
     specialization = models.CharField(
         verbose_name=_("Specialization"), max_length=100, blank=True
     )

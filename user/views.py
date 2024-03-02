@@ -143,29 +143,22 @@ def task_detail(request, pk):
     except Task.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # Check if the user is the writer of the task or is an admin user
-    if request.user.is_staff or task.writer == request.user:
-        if request.method == "GET":
-            serializer = TaskSerializer(task)
-            return Response(serializer.data)
+    if request.method == "GET":
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
 
-        elif request.method in ["PUT", "PATCH"]:
-            serializer = TaskSerializer(
-                task, data=request.data, partial=request.method == "PATCH"
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        elif request.method == "DELETE":
-            task.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-    else:
-        return Response(
-            {"message": "You don't have permission to access this task"},
-            status=status.HTTP_403_FORBIDDEN,
+    elif request.method in ["PUT", "PATCH"]:
+        serializer = TaskSerializer(
+            task, data=request.data, partial=request.method == "PATCH"
         )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # CRUD for clients
