@@ -137,7 +137,6 @@ def user_specific_tasks(request, user_id):
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
-@permission_classes([IsAuthenticated])
 def task_detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
